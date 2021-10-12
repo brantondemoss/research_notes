@@ -1,1 +1,3 @@
 # research_notes
+
+Notes on papers I'm reading, ideas for future research, etc...
