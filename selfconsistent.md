@@ -1,4 +1,4 @@
-% [Self-Consistent Models and Values](https:/A/arxiv.org/abs/2110.12840)
+% [Self-Consistent Models and Values](https://arxiv.org/abs/2110.12840)
 
 <center> Gregory Farquhar, Kate Baumli, Zita Marinho, Angelos Filos, </br>Matteo Hessel, Hado van Hasselt, David Silver </center>
 
