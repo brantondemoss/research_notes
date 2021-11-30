@@ -29,7 +29,7 @@ $$
 \right]
 $$
 
-where $\perp$ is the stop gradient operator[^1] [^2]. I still have to wonder if they need to always remain in the so-called "Value Equivalence" regime, where only vale/reward/policy gradients are allowed to adjust the model - could they not just do the same kind of self-consistency loss directly on the states? They state that:
+where $\perp$ is the stop gradient operator[^1] [^2]. I still have to wonder if they need to always remain in the so-called "Value Equivalence" regime, where only value/reward/policy gradients are allowed to adjust the model - could they not just do the same kind of self-consistency loss directly on the states? They state that:
 
 > [...] there is no loss on the latent states $z^k_t$: e.g. these are not required to match $z_{t+k} = h_{\theta}(o_{1:t+k})$
 

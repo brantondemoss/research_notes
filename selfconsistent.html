@@ -44,7 +44,7 @@ Gregory Farquhar, Kate Baumli, Zita Marinho, Angelos Filos, </br>Matteo Hessel, 
 \sum_{k=0}^{K} \left( \perp \left( \hat{r}_{k} + \gamma\hat{v}_{k+1} \right) -\hat{v}_k  \right)^2
 \right]
 \]</span></p>
-<p>where <span class="math inline">\(\perp\)</span> is the stop gradient operator<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>. I still have to wonder if they need to always remain in the so-called “Value Equivalence” regime, where only vale/reward/policy gradients are allowed to adjust the model - could they not just do the same kind of self-consistency loss directly on the states? They state that:</p>
+<p>where <span class="math inline">\(\perp\)</span> is the stop gradient operator<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>. I still have to wonder if they need to always remain in the so-called “Value Equivalence” regime, where only value/reward/policy gradients are allowed to adjust the model - could they not just do the same kind of self-consistency loss directly on the states? They state that:</p>
 <blockquote>
 <p>[…] there is no loss on the latent states <span class="math inline">\(z^k_t\)</span>: e.g. these are not required to match <span class="math inline">\(z_{t+k} = h_{\theta}(o_{1:t+k})\)</span></p>
 </blockquote>
