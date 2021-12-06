@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Reinforcement Learning as One Big Sequence Modeling Problem and   Decision Transformer: Reinforcement Learning via Sequence Modeling</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title"><a href="https://arxiv.org/abs/2106.02039">Reinforcement Learning as One Big Sequence Modeling Problem</a> and <br/> <a href="https://arxiv.org/abs/2106.01345">Decision Transformer: Reinforcement Learning via Sequence Modeling</a></h1>
+</header>
+<center>
+<h3 id="janner-li-and-levine-bair-chen-et-al-also-bair-fair">Janner, Li, and Levine @ BAIR &amp; Chen et al (also BAIR + FAIR)</h3>
+</center>
+<p><img src="rlsequence.png" /></p>
+<h3 id="what">What?</h3>
+<p>This paper recasts the RL problem as a sequence modeling task. Instead of trying to take actions optimally with respect to some value function (and learning what the value func/policy is along the way), can we use the tools of sequence prediction (a la GPT-N et al), with reward conditioned sequences, to simply predict stae/action trajectories with high reward?</p>
+<h3 id="pros">Pros:</h3>
+<p>Automatically get to condition on entire sequence, will help when Markov assumption is not good. Maybe helps with longer-horizon planning/coherency? &lt;- Would be good to test this. Actually, they state they get better long horizon results even in provably Markovian environments, which seems weird. Decode trajectories with high reward (not just high likelihood).</p>
+<p>Get goal-conditioned behaviour for free, by training a model which always has the goal state permuted to the sequence beginning, and leaving the causal attention mask.</p>
+<p>Offline RL for free, by also predicting reward-to-go <span class="math inline">\(\left( R_t = \sum_{t&#39;=t}^{T-1} \gamma^{t&#39;-t}r_{t&#39;} \right)\)</span>, then replacing the log likelihood of token with this quantity during search/planning step (note that this estimates the reward of the behavior policy, not anything optimal (or even self))</p>
+<p>Because policy and dynamics are trained jointly, they claim you automatically get soft constraints on never going out of distribution.</p>
+<h3 id="questions">Questions:</h3>
+<p>To what extent is memory of previous actions/states relevant to the performance gains here, vs architectural/algo differences? Could it be that any approach that adds action/state representation history would improve performance?</p>
+<h3 id="limitations">Limitations:</h3>
+<p>By modeling each dimension of state and action as a separate token, they severely limit the horizon context length to <span class="math inline">\(\left( \frac{512}{N+M+1} \right)\)</span> where <span class="math inline">\(N=\text{dim}(\text{states}), M=\text{dim}(\text{actions})\)</span>. Could making the context horizon longer improve the planning coherency?</p>
+</body>
+</html>
