@@ -29,20 +29,7 @@ The authors argue that this works because the teacher network only needs to lear
 
 I wonder what extra information the full teacher policy (as opposed to the usual training info of a single ground-truth executed action) contains - didn't Hinton or someone say that the logits of policies used for distillation contain "dark knowledge"? E.g. you can imagine softening an ensemble of classifiers on some labels, and training on the full cateogrical distribution rather than the true class label, and the logit distribution provides a much richer training signal that converges quickly. "Softened outputs reveal the dark knowledge in the ensemble." [^2]
 
-
-So how important is full state here really? It can be really hard to tell which components are necessary in papers like these, with so many moving parts. Let's try to enumerate all the sources of uncertainty and complexity that need to be managed:
-
-
-| Type      | Example | Solution |
-| :-: | :-: | :-: |
-| Goal/reward uncertainty      | Dancing       | Imitation or Inverse Reinforcement Learning |
-| Compounding error recovery    | Highway driving | On-policy learning |
-| Counterfactual planning | Board games | Test-time search with environment model |
-
-
-priveledged future info, can't have that in online setting, how can the teacher know what future to be privledged with respect to? is it enough to just give it one future
-
-I wonder if companies like Tesla are trying tricks like this - they clearly have the BEV working, and enough offline compute to calculate all the state information they could want... Rather than being priveledged about the current state, I wonder if being priveledged with respect to the future can help with learning good test-time policies... This is a bit like what the VQM paper does with envoding future variations with a future-privledged latent code.
+It's interesting to consider what other kinds of "priveledged information" can be used to accelerate training. Another commonly used version of this idea is the "benefit of hindsight", which is the knowledge of the future we can leverage after an episode is completed to better understand the (past's) present, e.g. using heavy offline compute after the fact and temporal consistency constraints to get better labels. The problem with these hindsight approaches is that many of their benefits can't easily be used in the online regime we want to stay in. E.g. even if I know what one potential future is when training a student policy, it may not be relevant for the new environment unroll with the current policy (state divergence too large). It could be interesting to train a teacher policy with access to the future expert state in a learned world model to accelerate policy convergence, then use the teacher policy in a DAgger manner to supervise a student policy...
 
 ## Using priveldged learning in the field
 
@@ -58,7 +45,35 @@ There are all kinds of tricks employed to overcome sim2real, and a slew of them 
 
 The setup is thus:
 
-A teacher policy runs your standard RL (PPO) in a simulated environment, where the reward is accurately following a command velocity
+A teacher policy runs your standard RL (PPO) in a simulated environment, where the reward is accurately following a command velocity. It has full, perfect state access and trains quickly. There is some domain randomization in terms of friction coefficients, force perturbations, etc... as well as a learned actuator module which translates actions to realistic torques (this is meant to model e.g. lag in actuator commands, mechanical errors/uncertainties, etc...).
+
+Next, a student policy is unrolled in the same noisy environment, but is trained solely through imitation learning to match the teacher policy, as well as reconstruct the teacher recurrent state from its belief state. Its observations are noised to make it robust to different real-world sensing failures.
+
+With just that, the student policy can be transferred zero-shot to the real robot and performs outstandingly!
+
+
+## Outstanding Problems
+
+There are a lot of different components playing together to make this work:
+
+- Learned actuator dynamics
+- RL with domain randomization and perturbation
+- Curriculum learning to ramp up difficulty at an appropriate rate
+- Student-teacher distillation with privleged information
+- Recurrent policy which integrates proprioceptive and exteroceptive information over time
+- Lots of little reward hacks for the teacher policy to learn smooth motion
+
+So how important is full state here really? It can be really hard to tell which components are necessary in papers like these, with so many moving parts. Let's try to enumerate all the sources of uncertainty and complexity that need to be managed:
+
+
+| Type      | Example | Solution |
+| :-: | :-: | :-: |
+| Goal/reward uncertainty      | Dancing       | Imitation or Inverse Reinforcement Learning |
+| Compounding error recovery    | Highway driving | On-policy learning |
+| Counterfactual planning | Board games | Test-time search with environment model |
+
+
+priveledged future info, can't have that in online setting, how can the teacher know what future to be privledged with respect to? is it enough to just give it one future
 
 [^1]: [A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning](https://www.cs.cmu.edu/~sross1/publications/Ross-AIStats11-NoRegret.pdf)
 
